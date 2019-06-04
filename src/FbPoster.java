@@ -20,12 +20,12 @@ public class FbPoster {
             "X's friend list is pretty cool looking.",
             "Check it out, I made art out of X's friend list!"};
 
+    private String accessToken = "";
+    private String pageId = "";
+
     public void postPhoto(String name) {
 
         System.out.println("Uploading photo...");
-
-        String accessToken = "";
-        String pageId = "";
 
         Random rand = new Random();
         String message = messages[rand.nextInt(messages.length)].replace("X", name);

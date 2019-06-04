@@ -38,9 +38,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
+// TODO: Proper java code style cleanup
+// TODO: Link to gephi-toolkit HeadlessSimple code that I started with
+
 public class GephiVizualizer {
 
-    private String[] datasets = {"data/alfred1.graphml",
+    private String[] datasets = {"data/alfred1.graphml", // TODO: Find a different way to select a random dataset from the directory THAT REQUIRES LESS LINES!
             "data/alfred2.graphml",
             "data/bruno1.graphml",
             "data/bruno2.graphml",
@@ -115,37 +118,21 @@ public class GephiVizualizer {
 
         rand = new Random();
 
-        // get randoms (make this a separate function once recommender is up)
-
-        int options[] = getOptions();
         String name = datasets[rand.nextInt(datasets.length)];
 
         setup();
         importData(name);
         filter();
-        layout(options[0]);
-        color(options[1]);
-        size(options[2]);
-        preview(options[3], options[4], options[5]);
+        layout();
+        color();
+        size();
+        preview();
         export();
 
         name = name.substring(5,name.length()-8).replaceAll("\\d","");
-        name = name.substring(0, 1).toUpperCase() + name.substring(1);
+        name = name.substring(0, 1).toUpperCase() + name.substring(1);                      // TODO: Capitalize first letter in the actual file names and get rid of this line
 
         return (name);
-    }
-
-    private int[] getOptions() {
-        int options[] = new int [6];
-
-        options[0] = rand.nextInt(5);
-        options[1] = rand.nextInt(5);
-        options[2] = rand.nextInt(5);
-        options[3] = rand.nextInt(2);
-        options[4] = rand.nextInt(4);
-        options[5] = rand.nextInt(3);
-
-        return options;
     }
 
     private void setup() {
@@ -184,8 +171,8 @@ public class GephiVizualizer {
 
         //See if graph is well imported
         graph = graphModel.getUndirectedGraph();
-        //System.out.println("Nodes: " + graph.getNodeCount());
-        //System.out.println("Edges: " + graph.getEdgeCount());
+        System.out.println("Nodes: " + graph.getNodeCount());
+        System.out.println("Edges: " + graph.getEdgeCount());
 
         System.out.println("Data imported");
     }
@@ -202,16 +189,16 @@ public class GephiVizualizer {
 
         //See visible graph stats
         UndirectedGraph graphVisible = graphModel.getUndirectedGraphVisible();
-        //System.out.println("Nodes: " + graphVisible.getNodeCount());
-        //System.out.println("Edges: " + graphVisible.getEdgeCount());
+        System.out.println("Filtered Nodes: " + graphVisible.getNodeCount());
+        System.out.println("Filtered Edges: " + graphVisible.getEdgeCount());
 
         System.out.println("Data filtered");
     }
 
+    private void layout() { // TODO: Decide whether or not to update probability of each layout. Make plain Fruchterman Reingold happen less and ForceAtlas2 work more
 
-    private void layout(int option) {
-
-        int iters = rand.nextInt(60)+70;
+        int iters = rand.nextInt(30)+100;
+        int option = rand.nextInt(5);
 
         switch (option) {
             case 1: // ForceAtlas
@@ -300,9 +287,10 @@ public class GephiVizualizer {
         System.out.println("Layout complete");
     }
 
-    private void color(int option) {  // TODO: Make a custom palette generator?
-                                      // TODO: Color scales of 2-4 colors rather than just 2
+    private void color() {            // TODO: Make a custom palette generator?
+                                      // TODO: Add rare option of color function containing 3 colors
         Color color1, color2;
+        int option = rand.nextInt(5);
 
         if(rand.nextInt(8)==1){ // Chance to choose grayscale
             int r1 = rand.nextInt(255);
@@ -380,10 +368,12 @@ public class GephiVizualizer {
         System.out.println("Color transform complete");
     }
 
-    private void size(int option) {
+    private void size() {
 
         int minSize = rand.nextInt(2) + 1;
         int maxSize = rand.nextInt(12) + 8;
+
+        int option = rand.nextInt(5);
 
         switch(option) {
             case 1: { // Rank size by Eigenvector Centrality
@@ -441,56 +431,45 @@ public class GephiVizualizer {
         System.out.println("Size transform complete");
     }
 
-    private void preview(int option1, int option2, int option3) {
+    private void preview() {
 
         model.getProperties().putValue(PreviewProperty.SHOW_NODE_LABELS, Boolean.FALSE);
         model.getProperties().putValue(PreviewProperty.EDGE_COLOR, new EdgeColor(EdgeColor.Mode.MIXED));
         model.getProperties().putValue(PreviewProperty.NODE_BORDER_WIDTH, 0);
 
-        // curved / straight edges (this is being done in a really dumb way for consistency
-
-        switch(option1) {
-            case 1:
-                model.getProperties().putValue(PreviewProperty.EDGE_CURVED, true);
-                break;
-            default:
-                model.getProperties().putValue(PreviewProperty.EDGE_CURVED, false);
-                break;
+        // Edge type (50% Straight, 50% Curved)
+        if (rand.nextBoolean()) {
+            model.getProperties().putValue(PreviewProperty.EDGE_CURVED, true);
+        } else {
+            model.getProperties().putValue(PreviewProperty.EDGE_CURVED, false);
         }
 
-        // node/edge visibility
-        switch(option2) {
-            case 1:
-                model.getProperties().putValue(PreviewProperty.NODE_OPACITY, 0.01);
-                model.getProperties().putValue(PreviewProperty.EDGE_OPACITY, rand.nextFloat()*100);
-                model.getProperties().putValue(PreviewProperty.EDGE_THICKNESS, rand.nextFloat()*14.9+.1f);
-                break;
-            case 2:
-                model.getProperties().putValue(PreviewProperty.NODE_OPACITY, rand.nextFloat()*100);
-                model.getProperties().putValue(PreviewProperty.EDGE_OPACITY, rand.nextFloat()*100);
-                model.getProperties().putValue(PreviewProperty.EDGE_THICKNESS, rand.nextFloat()*0.9+.1f);
-                break;
-            case 3:
-                model.getProperties().putValue(PreviewProperty.EDGE_OPACITY, rand.nextFloat()*90 + 10);
-                model.getProperties().putValue(PreviewProperty.EDGE_THICKNESS, rand.nextFloat()*0.9+.1f);
-                break;
-            default:
-                model.getProperties().putValue(PreviewProperty.EDGE_THICKNESS, rand.nextFloat()*0.9+.1f);
-                break;
+        // Graph style (10% Invisible nodes, 40% Random opacity, 30% Normal nodes, 20% Normal nodes/edges)
+        int option = rand.nextInt(10);
+        if (option < 2) {
+            model.getProperties().putValue(PreviewProperty.NODE_OPACITY, 0.01);
+            model.getProperties().putValue(PreviewProperty.EDGE_OPACITY, rand.nextFloat()*100);
+            model.getProperties().putValue(PreviewProperty.EDGE_THICKNESS, rand.nextFloat()*14.9+.1f);
+        } else if (option < 5) {
+            model.getProperties().putValue(PreviewProperty.NODE_OPACITY, rand.nextFloat()*100);
+            model.getProperties().putValue(PreviewProperty.EDGE_OPACITY, rand.nextFloat()*100);
+            model.getProperties().putValue(PreviewProperty.EDGE_THICKNESS, rand.nextFloat()*0.9+.1f);
+        } else if (option < 8) {
+            model.getProperties().putValue(PreviewProperty.EDGE_OPACITY, rand.nextFloat()*90 + 10);
+            model.getProperties().putValue(PreviewProperty.EDGE_THICKNESS, rand.nextFloat()*0.9+.1f);
+        } else {
+            model.getProperties().putValue(PreviewProperty.EDGE_THICKNESS, rand.nextFloat()*0.9+.1f);
         }
 
-        // background color
-        switch(option3) {
-            case 1:
-                model.getProperties().putValue(PreviewProperty.BACKGROUND_COLOR, Color.BLACK);
-                break;
-            case 2:
-                model.getProperties().putValue(PreviewProperty.BACKGROUND_COLOR, Color.WHITE);
-                break;
-            default:
-                Color c = new Color(rand.nextInt(255), rand.nextInt(255), rand.nextInt(255));
-                model.getProperties().putValue(PreviewProperty.BACKGROUND_COLOR, c);
-                break;
+        // Background color (20% White, 20% Random, 60% Black)
+        option = rand.nextInt(5);
+        if (option < 1) {
+            model.getProperties().putValue(PreviewProperty.BACKGROUND_COLOR, Color.WHITE);
+        } else if (option < 2) {
+            Color c = new Color(rand.nextInt(255), rand.nextInt(255), rand.nextInt(255));
+            model.getProperties().putValue(PreviewProperty.BACKGROUND_COLOR, c);
+        } else {
+            model.getProperties().putValue(PreviewProperty.BACKGROUND_COLOR, Color.BLACK);
         }
 
         System.out.println("Exporting...");

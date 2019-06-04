@@ -1,3 +1,4 @@
+import com.itextpdf.text.PageSize;
 import org.gephi.appearance.api.*;
 import org.gephi.appearance.plugin.PartitionElementColorTransformer;
 import org.gephi.appearance.plugin.RankingElementColorTransformer;
@@ -38,12 +39,22 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
+// TODO: Find a replacement for org.openide.util.Lookup since this keeps causing warnings
 // TODO: Proper java code style cleanup
 // TODO: Link to gephi-toolkit HeadlessSimple code that I started with
+// TODO: Fix up the text printed to the console
+// TODO: Find a different way to select a random dataset from the directory THAT REQUIRES LESS LINES!
+// TODO: I think there may be node coordinates saved into some of the graphml files. Find a way to get rid of these OR ensure coordinates are randomized on import
+// TODO: Capitalize first letter in the actual file names and get rid of this line
+// TODO: Update probability of each layout. Make plain Fruchterman Reingold happen less and ForceAtlas2 work more
+// TODO: Use specific range of iters for each layout option (Some make really small initial steps so the low range must be raised)
+// TODO: Make a custom palette generator?
+// TODO: Add rare option of color function containing 3 colors
+// TODO: Make exported PDF square (figure out how to get a square PageSize)
 
 public class GephiVizualizer {
 
-    private String[] datasets = {"data/alfred1.graphml", // TODO: Find a different way to select a random dataset from the directory THAT REQUIRES LESS LINES!
+    private String[] datasets = {"data/alfred1.graphml",
             "data/alfred2.graphml",
             "data/bruno1.graphml",
             "data/bruno2.graphml",
@@ -130,7 +141,7 @@ public class GephiVizualizer {
         export();
 
         name = name.substring(5,name.length()-8).replaceAll("\\d","");
-        name = name.substring(0, 1).toUpperCase() + name.substring(1);                      // TODO: Capitalize first letter in the actual file names and get rid of this line
+        name = name.substring(0, 1).toUpperCase() + name.substring(1);
 
         return (name);
     }
@@ -151,8 +162,7 @@ public class GephiVizualizer {
         appearanceModel = appearanceController.getModel();
     }
 
-
-    private void importData(String filepath) { // TODO: Merge duplicate edges at minimum weight
+    private void importData(String filepath) {
 
         //Import file
         Container container;
@@ -195,7 +205,7 @@ public class GephiVizualizer {
         System.out.println("Data filtered");
     }
 
-    private void layout() { // TODO: Decide whether or not to update probability of each layout. Make plain Fruchterman Reingold happen less and ForceAtlas2 work more
+    private void layout() {
 
         int iters = rand.nextInt(30)+100;
         int option = rand.nextInt(5);
@@ -287,8 +297,7 @@ public class GephiVizualizer {
         System.out.println("Layout complete");
     }
 
-    private void color() {            // TODO: Make a custom palette generator?
-                                      // TODO: Add rare option of color function containing 3 colors
+    private void color() {
         Color color1, color2;
         int option = rand.nextInt(5);
 
@@ -496,13 +505,14 @@ public class GephiVizualizer {
         }
 
         PDFExporter exp2 = new PDFExporter();
+        exp2.setPageSize(PageSize.NOTE);
         exp2.setWorkspace(workspace);
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
         Date date = new Date();
         String filename = dateFormat.format(date);
 
-        // export pdf   // TODO: Make PDF square
+        // export pdf
         try {
             File newPdf = new File("/Users/EBT/Desktop/FriendlyBotFB/pdfs/" + filename + ".pdf");
             ec.exportFile(newPdf, exp2);

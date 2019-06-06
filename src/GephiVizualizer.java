@@ -81,7 +81,7 @@ public class GephiVizualizer {
             "data/Hermano1.graphml",
             "data/Hermano2.graphml",
             "data/Ishmael1.graphml",
-            "data/Ishmael.graphml",
+            "data/Ishmael2.graphml",
             "data/Jack1.graphml",
             "data/Jack2.graphml",
             "data/Jordan1.graphml",

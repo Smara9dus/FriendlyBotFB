@@ -106,6 +106,8 @@ public class GephiVizualizer {
             "data/Luce2.graphml",
             "data/Malcolm1.graphml",
             "data/Malcolm2.graphml",
+            "data/Mia1.graphml",
+            "data/Mia2.graphml",
             "data/Michael1.graphml",
             "data/Michael2.graphml",
             "data/Michael3.graphml",

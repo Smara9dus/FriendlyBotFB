@@ -54,14 +54,20 @@ import java.util.Random;
 
 public class GephiVizualizer {
 
-    private String[] datasets = {"data/Alfred1.graphml",
+    private String[] datasets = {"data/Al1.graphml",
+            "data/Al2.graphml",
+            "data/Alfred1.graphml",
             "data/Alfred2.graphml",
             "data/An1.graphml",
             "data/An2.graphml",
+            "data/Brian1.graphml",
+            "data/Brian2.graphml",
             "data/Bruno1.graphml",
             "data/Bruno2.graphml",
             "data/Butthole1.graphml",
             "data/Butthole2.graphml",
+            "data/David1.graphml",
+            "data/David2.graphml",
             "data/Denisa1.graphml",
             "data/Denisa2.graphml",
             "data/Emerald1.graphml",
@@ -74,18 +80,25 @@ public class GephiVizualizer {
             "data/Erin2.graphml",
             "data/Fabricio1.graphml",
             "data/Fabricio2.graphml",
+            "data/Failsen of Clan Moran1.graphml",
+            "data/Failsen of Clan Moran2.graphml",
+            "data/Jordan2.graphml",
             "data/Goyman2.graphml",
             "data/Goyman2.graphml",
             "data/Gareth1.graphml",
             "data/Gareth2.graphml",
             "data/Hermano1.graphml",
             "data/Hermano2.graphml",
+            "data/Hugo1.graphml",
+            "data/Hugo2.graphml",
             "data/Ishmael1.graphml",
             "data/Ishmael2.graphml",
             "data/Jack1.graphml",
             "data/Jack2.graphml",
             "data/Jordan1.graphml",
             "data/Jordan2.graphml",
+            "data/Joshua1.graphml",
+            "data/Joshua2.graphml",
             "data/Jovin1.graphml",
             "data/Jovin2.graphml",
             "data/Joy1.graphml",
@@ -94,12 +107,16 @@ public class GephiVizualizer {
             "data/Jules2.graphml",
             "data/Justin1.graphml",
             "data/Justin2.graphml",
+            "data/Kimberly1.graphml",
+            "data/Kimberly2.graphml",
             "data/Kojin1.graphml",
             "data/Kojin2.graphml",
             "data/Kunal1.graphml",
             "data/Kunal2.graphml",
             "data/Leon1.graphml",
             "data/Leon2.graphml",
+            "data/Logan1.graphml",
+            "data/Logan2.graphml",
             "data/Lopes1.graphml",
             "data/Lopes2.graphml",
             "data/Luce1.graphml",
@@ -120,6 +137,8 @@ public class GephiVizualizer {
             "data/Mr. Swag2.graphml",
             "data/Niels1.graphml",
             "data/Niels2.graphml",
+            "data/Oli Verr1.graphml",
+            "data/Oli Verr2.graphml",
             "data/Quinten1.graphml",
             "data/Quinten2.graphml",
             "data/Rachel1.graphml",
@@ -128,8 +147,14 @@ public class GephiVizualizer {
             "data/Rodrigo2.graphml",
             "data/Ruan1.graphml",
             "data/Ruan2.graphml",
+            "data/Ryan1.graphml",
+            "data/Ryan2.graphml",
             "data/Semolini1.graphml",
             "data/Semolini2.graphml",
+            "data/Semolini3.graphml",
+            "data/Semolini4.graphml",
+            "data/Shayor1.graphml",
+            "data/Shayor2.graphml",
             "data/Tj1.graphml",
             "data/Tj2.graphml",
             "data/TotBot1.graphml",
@@ -235,11 +260,11 @@ public class GephiVizualizer {
     private void layout() {
 
         int iters = rand.nextInt(30)+100;
-        int option = rand.nextInt(5);
+        int option = rand.nextInt(4);
 
         switch (option) {
             case 1: // ForceAtlas
-                //System.out.println("Layout: ForceAtlas");
+                System.out.println("Layout: ForceAtlas");
                 ForceAtlasLayout forceAtlas = new ForceAtlasLayout(null);
                 forceAtlas.setGraphModel(graphModel);
                 forceAtlas.resetPropertiesValues();
@@ -251,7 +276,7 @@ public class GephiVizualizer {
                 forceAtlas.endAlgo();
                 break;
             case 2: //ForceAtlas2
-                //System.out.println("Layout: ForceAtlas2");
+                System.out.println("Layout: ForceAtlas2");
                 ForceAtlas2 forceAtlas2 = new ForceAtlas2(null);
                 forceAtlas2.setGraphModel(graphModel);
                 forceAtlas2.resetPropertiesValues();
@@ -265,7 +290,21 @@ public class GephiVizualizer {
                 forceAtlas2.endAlgo();
                 break;
             case 3: // Fruchterman Reingold
-                //System.out.println("Layout: Fruchterman Reingold");
+                System.out.println("Layout: Fruchterman Reingold");
+
+                if (rand.nextInt(5) == 0) {
+                    ForceAtlas2 prefruchterman = new ForceAtlas2(null);
+                    prefruchterman.setGraphModel(graphModel);
+                    prefruchterman.resetPropertiesValues();
+                    prefruchterman.setStrongGravityMode(Boolean.TRUE);
+                    prefruchterman.setGravity(0.2);
+
+                    prefruchterman.initAlgo();
+                    for (int i = 0; i < 100 && prefruchterman.canAlgo(); i++) {
+                        prefruchterman.goAlgo();
+                    }
+                    prefruchterman.endAlgo();
+                }
 
                 FruchtermanReingold fruchterman = new FruchtermanReingold(null);
                 fruchterman.setGraphModel(graphModel);
@@ -279,35 +318,8 @@ public class GephiVizualizer {
                 }
                 fruchterman.endAlgo();
                 break;
-            case 4:
-                //System.out.println("Layout: ForceAtlas2 + Fruchterman Reingold");
-                ForceAtlas2 prefruchterman = new ForceAtlas2(null);
-                prefruchterman.setGraphModel(graphModel);
-                prefruchterman.resetPropertiesValues();
-                prefruchterman.setStrongGravityMode(Boolean.TRUE);
-                prefruchterman.setGravity(0.2);
-
-                prefruchterman.initAlgo();
-                for (int i = 0; i < 100 && prefruchterman.canAlgo(); i++) {
-                    prefruchterman.goAlgo();
-                }
-                prefruchterman.endAlgo();
-
-
-                FruchtermanReingold fruchterman2 = new FruchtermanReingold(null);
-                fruchterman2.setGraphModel(graphModel);
-                fruchterman2.resetPropertiesValues();
-                fruchterman2.setGravity(100.0);
-                fruchterman2.setSpeed(10.0);
-
-                fruchterman2.initAlgo();
-                for (int i = 0; i < iters && fruchterman2.canAlgo(); i++) {
-                    fruchterman2.goAlgo();
-                }
-                fruchterman2.endAlgo();
-                break;
             default: // Yifan Hu
-                //System.out.println("Layout: Yifan Hu");
+                System.out.println("Layout: Yifan Hu");
                 YifanHuLayout layout = new YifanHuLayout(null, new StepDisplacement(1f));
                 layout.setGraphModel(graphModel);
                 layout.resetPropertiesValues();

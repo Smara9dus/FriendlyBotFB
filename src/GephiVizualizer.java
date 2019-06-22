@@ -22,6 +22,7 @@ import org.gephi.layout.plugin.force.yifanHu.YifanHuLayout;
 import org.gephi.layout.plugin.forceAtlas.ForceAtlasLayout;
 import org.gephi.layout.plugin.forceAtlas2.ForceAtlas2;
 import org.gephi.layout.plugin.fruchterman.FruchtermanReingold;
+import org.gephi.layout.plugin.random.RandomLayout;
 import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperty;
@@ -44,13 +45,13 @@ import java.util.Random;
 // TODO: Link to gephi-toolkit HeadlessSimple code that I started with
 // TODO: Fix up the text printed to the console
 // TODO: Find a different way to select a random dataset from the directory THAT REQUIRES LESS LINES!
-// TODO: I think there may be node coordinates saved into some of the graphml files. Find a way to get rid of these OR ensure coordinates are randomized on import
 // TODO: Capitalize first letter in the actual file names and get rid of this line
 // TODO: Update probability of each layout. Make plain Fruchterman Reingold happen less and ForceAtlas2 work more
 // TODO: Use specific range of iters for each layout option (Some make really small initial steps so the low range must be raised)
 // TODO: Make a custom palette generator?
 // TODO: Add rare option of color function containing 3 colors
 // TODO: Make exported PDF square (figure out how to get a square PageSize)
+// TODO: Modularity doesn't work for some datasets, switch to using forcePartitionFunction
 
 public class GephiVizualizer {
 
@@ -258,6 +259,12 @@ public class GephiVizualizer {
     }
 
     private void layout() {
+
+        RandomLayout randomLayout = new RandomLayout(null, 20d);
+        randomLayout.setGraphModel(graphModel);
+        randomLayout.initAlgo();
+        randomLayout.goAlgo();
+        randomLayout.endAlgo();
 
         int iters = rand.nextInt(30)+100;
         int option = rand.nextInt(4);

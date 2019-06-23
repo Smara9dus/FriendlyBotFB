@@ -44,7 +44,6 @@ import java.util.Random;
 // TODO: Proper java code style cleanup
 // TODO: Link to gephi-toolkit HeadlessSimple code that I started with
 // TODO: Get rid of duplicate files and change filtering function
-// TODO: Find a different way to select a random dataset from the directory THAT REQUIRES LESS LINES!
 // TODO: Update probability of each layout. Make plain Fruchterman Reingold happen less and ForceAtlas2 work more
 // TODO: Use specific range of iters for each layout option (Some make really small initial steps so the low range must be raised)
 // TODO: Make a custom palette generator?
@@ -52,120 +51,9 @@ import java.util.Random;
 // TODO: Make exported PDF square (figure out how to get a square PageSize)
 // TODO: Modularity doesn't work for some datasets, switch to using forcePartitionFunction
 // TODO: Add progress tickets for each step
+// TODO: Add name to exported pdf filename
 
-public class GephiVizualizer {
-
-    private String[] datasets = {"data/Al1.graphml",
-            "data/Al2.graphml",
-            "data/Alfred1.graphml",
-            "data/Alfred2.graphml",
-            "data/An1.graphml",
-            "data/An2.graphml",
-            "data/Brian1.graphml",
-            "data/Brian2.graphml",
-            "data/Bruno1.graphml",
-            "data/Bruno2.graphml",
-            "data/Butthole1.graphml",
-            "data/Butthole2.graphml",
-            "data/David1.graphml",
-            "data/David2.graphml",
-            "data/Denisa1.graphml",
-            "data/Denisa2.graphml",
-            "data/Emerald1.graphml",
-            "data/Emerald2.graphml",
-            "data/Emma1.graphml",
-            "data/Emma2.graphml",
-            "data/Ennon1.graphml",
-            "data/Ennon2.graphml",
-            "data/Erin1.graphml",
-            "data/Erin2.graphml",
-            "data/Fabricio1.graphml",
-            "data/Fabricio2.graphml",
-            "data/Failsen of Clan Moran1.graphml",
-            "data/Failsen of Clan Moran2.graphml",
-            "data/Jordan2.graphml",
-            "data/Goyman2.graphml",
-            "data/Goyman2.graphml",
-            "data/Gareth1.graphml",
-            "data/Gareth2.graphml",
-            "data/Hermano1.graphml",
-            "data/Hermano2.graphml",
-            "data/Hugo1.graphml",
-            "data/Hugo2.graphml",
-            "data/Ishmael1.graphml",
-            "data/Ishmael2.graphml",
-            "data/Jack1.graphml",
-            "data/Jack2.graphml",
-            "data/Jordan1.graphml",
-            "data/Jordan2.graphml",
-            "data/Joshua1.graphml",
-            "data/Joshua2.graphml",
-            "data/Jovin1.graphml",
-            "data/Jovin2.graphml",
-            "data/Joy1.graphml",
-            "data/Joy2.graphml",
-            "data/Jules1.graphml",
-            "data/Jules2.graphml",
-            "data/Justin1.graphml",
-            "data/Justin2.graphml",
-            "data/Kimberly1.graphml",
-            "data/Kimberly2.graphml",
-            "data/Kojin1.graphml",
-            "data/Kojin2.graphml",
-            "data/Kunal1.graphml",
-            "data/Kunal2.graphml",
-            "data/Leon1.graphml",
-            "data/Leon2.graphml",
-            "data/Logan1.graphml",
-            "data/Logan2.graphml",
-            "data/Lopes1.graphml",
-            "data/Lopes2.graphml",
-            "data/Luce1.graphml",
-            "data/Luce2.graphml",
-            "data/Malcolm1.graphml",
-            "data/Malcolm2.graphml",
-            "data/Mia1.graphml",
-            "data/Mia2.graphml",
-            "data/Michael1.graphml",
-            "data/Michael2.graphml",
-            "data/Michael3.graphml",
-            "data/Michael4.graphml",
-            "data/Mila1.graphml",
-            "data/Mila2.graphml",
-            "data/Mr. Squiggles1.graphml",
-            "data/Mr. Squiggles2.graphml",
-            "data/Mr. Swag1.graphml",
-            "data/Mr. Swag2.graphml",
-            "data/Niels1.graphml",
-            "data/Niels2.graphml",
-            "data/Oli Verr1.graphml",
-            "data/Oli Verr2.graphml",
-            "data/Quinten1.graphml",
-            "data/Quinten2.graphml",
-            "data/Rachel1.graphml",
-            "data/Rachel2.graphml",
-            "data/Rodrigo1.graphml",
-            "data/Rodrigo2.graphml",
-            "data/Ruan1.graphml",
-            "data/Ruan2.graphml",
-            "data/Ryan1.graphml",
-            "data/Ryan2.graphml",
-            "data/Semolini1.graphml",
-            "data/Semolini2.graphml",
-            "data/Semolini3.graphml",
-            "data/Semolini4.graphml",
-            "data/Shayor1.graphml",
-            "data/Shayor2.graphml",
-            "data/Tj1.graphml",
-            "data/Tj2.graphml",
-            "data/TotBot1.graphml",
-            "data/TotBot2.graphml",
-            "data/Vinicius1.graphml",
-            "data/Vinicius2.graphml",
-            "data/Will1.graphml",
-            "data/Will2.graphml",
-            "data/Zain1.graphml",
-            "data/Zain2.graphml"};
+public class GephiVisualizer {
 
     private Random rand;
 
@@ -179,14 +67,17 @@ public class GephiVizualizer {
     private AppearanceController appearanceController;
     private AppearanceModel appearanceModel;
 
-    public String vizualize() {
+    public String visualize() {
 
         rand = new Random();
 
-        String name = datasets[rand.nextInt(datasets.length)];
+        File dir = new File("src/data/");
+        File[] list = dir.listFiles();
+
+        File f = list[rand.nextInt(list.length)];
 
         setup();
-        importData(name);
+        importData(f);
         filter();
         layout();
         color();
@@ -194,9 +85,7 @@ public class GephiVizualizer {
         preview();
         export();
 
-        name = name.substring(5,name.length()-8).replaceAll("\\d","");
-
-        return (name);
+        return f.getPath().substring(9,f.getPath().length()-8).replaceAll("\\d","");
     }
 
     private void setup() {
@@ -215,14 +104,13 @@ public class GephiVizualizer {
         appearanceModel = appearanceController.getModel();
     }
 
-    private void importData(String filepath) {
+    private void importData(File f) {
 
         //Import file
         Container container;
         try {
-            System.out.println("Filepath: " + filepath);
-            File file = new File(getClass().getResource(filepath).toURI());
-            container = importController.importFile(file);
+            System.out.println("Filepath: " + f);
+            container = importController.importFile(f);
             container.getLoader().setEdgeDefault(EdgeDirectionDefault.UNDIRECTED);   //Force UNDIRECTED
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -476,7 +364,7 @@ public class GephiVizualizer {
             }
         }
 
-        System.out.println("Size transform complete");
+        System.out.println("Size function complete");
     }
 
     private void preview() {
@@ -540,7 +428,8 @@ public class GephiVizualizer {
 
         // export png
         try {
-            File newPng = new File("/Users/EBT/Desktop/FriendlyBotFB/recent.png");
+            //File newPng = new File("/Users/EBT/Desktop/FriendlyBotFB/recent.png");
+            File newPng = new File("recent.png");
             ec.exportFile(newPng, exp);
             System.out.println("Png Exported");
         } catch (IOException ex) {
@@ -558,7 +447,8 @@ public class GephiVizualizer {
 
         // export pdf
         try {
-            File newPdf = new File("/Users/EBT/Desktop/FriendlyBotFB/pdfs/" + filename + ".pdf");
+            //File newPdf = new File("/Users/EBT/Desktop/FriendlyBotFB/pdfs/" + filename + ".pdf");
+            File newPdf = new File("pdfs/" + filename + ".pdf");
             ec.exportFile(newPdf, exp2);
             System.out.println("Pdf Exported");
         } catch (IOException ex) {

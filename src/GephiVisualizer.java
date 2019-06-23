@@ -5,6 +5,7 @@ import org.gephi.appearance.plugin.RankingElementColorTransformer;
 import org.gephi.appearance.plugin.RankingNodeSizeTransformer;
 import org.gephi.appearance.plugin.palette.Palette;
 import org.gephi.appearance.plugin.palette.PaletteManager;
+import org.gephi.datalab.impl.GraphElementsControllerImpl;
 import org.gephi.filters.api.FilterController;
 import org.gephi.filters.api.Query;
 import org.gephi.filters.api.Range;
@@ -43,8 +44,6 @@ import java.util.Random;
 // TODO: Find a replacement for org.openide.util.Lookup since this keeps causing warnings
 // TODO: Proper java code style cleanup
 // TODO: Link to gephi-toolkit HeadlessSimple code that I started with
-// TODO: Get rid of duplicate files and change filtering function
-// TODO: Update probability of each layout. Make plain Fruchterman Reingold happen less and ForceAtlas2 work more
 // TODO: Use specific range of iters for each layout option (Some make really small initial steps so the low range must be raised)
 // TODO: Make a custom palette generator?
 // TODO: Add rare option of color function containing 3 colors
@@ -52,6 +51,7 @@ import java.util.Random;
 // TODO: Modularity doesn't work for some datasets, switch to using forcePartitionFunction
 // TODO: Add progress tickets for each step
 // TODO: Add name to exported pdf filename
+// TODO: Invent a new circular layout
 
 public class GephiVisualizer {
 
@@ -106,6 +106,8 @@ public class GephiVisualizer {
 
     private void importData(File f) {
 
+        System.out.println("Importing data");
+
         //Import file
         Container container;
         try {
@@ -123,20 +125,39 @@ public class GephiVisualizer {
         //See if graph is well imported
         graph = graphModel.getUndirectedGraph();
 
-        System.out.println("Data imported");
+        System.out.println("Import complete");
     }
 
     private void filter() {
 
-        //Filter out floating nodes
-        DegreeRangeFilter degreeFilter = new DegreeRangeFilter();
-        degreeFilter.init(graph);
-        degreeFilter.setRange(new Range(1, Integer.MAX_VALUE));
-        Query query = filterController.createQuery(degreeFilter);
-        GraphView view = filterController.filter(query);
-        graphModel.setVisibleView(view);
+        System.out.println("Filtering data");
 
-        System.out.println("Data filtered");
+        if(rand.nextInt(3) == 0) {
+            System.out.println("Central node present");
+
+            Node[] nodes = graph.getNodes().toArray();
+            Node user = graphModel.factory().newNode("0");
+            graph.addNode(user);
+            Edge e;
+
+            for (Node n : nodes) {
+                e = graphModel.factory().newEdge(user,n,false);
+                graph.addEdge(e);
+            }
+
+        } else {
+            System.out.println("Central node absent");
+
+            //Filter out floating nodes
+            DegreeRangeFilter degreeFilter = new DegreeRangeFilter();
+            degreeFilter.init(graph);
+            degreeFilter.setRange(new Range(1, Integer.MAX_VALUE));
+            Query query = filterController.createQuery(degreeFilter);
+            GraphView view = filterController.filter(query);
+            graphModel.setVisibleView(view);
+        }
+
+        System.out.println("Filter complete");
     }
 
     private void layout() {
@@ -148,36 +169,37 @@ public class GephiVisualizer {
         randomLayout.endAlgo();
 
         int iters = rand.nextInt(30)+100;
-        int option = rand.nextInt(4);
+        int option = rand.nextInt(3);
 
         switch (option) {
             case 1: // ForceAtlas
-                System.out.println("Layout: ForceAtlas");
-                ForceAtlasLayout forceAtlas = new ForceAtlasLayout(null);
-                forceAtlas.setGraphModel(graphModel);
-                forceAtlas.resetPropertiesValues();
+                if (rand.nextInt(3) == 0) {
+                    System.out.println("Layout: ForceAtlas");
+                    ForceAtlasLayout forceAtlas = new ForceAtlasLayout(null);
+                    forceAtlas.setGraphModel(graphModel);
+                    forceAtlas.resetPropertiesValues();
 
-                forceAtlas.initAlgo();
-                for (int i = 0; i <  iters && forceAtlas.canAlgo(); i++) {
-                    forceAtlas.goAlgo();
-                }
-                forceAtlas.endAlgo();
-                break;
-            case 2: //ForceAtlas2
-                System.out.println("Layout: ForceAtlas2");
-                ForceAtlas2 forceAtlas2 = new ForceAtlas2(null);
-                forceAtlas2.setGraphModel(graphModel);
-                forceAtlas2.resetPropertiesValues();
-                forceAtlas2.setStrongGravityMode(Boolean.TRUE);
-                forceAtlas2.setGravity(0.2);
+                    forceAtlas.initAlgo();
+                    for (int i = 0; i < iters && forceAtlas.canAlgo(); i++) {
+                        forceAtlas.goAlgo();
+                    }
+                    forceAtlas.endAlgo();
+                } else {
+                    System.out.println("Layout: ForceAtlas2");
+                    ForceAtlas2 forceAtlas2 = new ForceAtlas2(null);
+                    forceAtlas2.setGraphModel(graphModel);
+                    forceAtlas2.resetPropertiesValues();
+                    forceAtlas2.setStrongGravityMode(Boolean.TRUE);
+                    forceAtlas2.setGravity(0.2);
 
-                forceAtlas2.initAlgo();
-                for (int i = 0; i < iters && forceAtlas2.canAlgo(); i++) {
-                    forceAtlas2.goAlgo();
+                    forceAtlas2.initAlgo();
+                    for (int i = 0; i < iters && forceAtlas2.canAlgo(); i++) {
+                        forceAtlas2.goAlgo();
+                    }
+                    forceAtlas2.endAlgo();
                 }
-                forceAtlas2.endAlgo();
                 break;
-            case 3: // Fruchterman Reingold
+            case 2: // Fruchterman Reingold
                 System.out.println("Layout: Fruchterman Reingold");
 
                 if (rand.nextInt(5) == 0) {
@@ -428,8 +450,7 @@ public class GephiVisualizer {
 
         // export png
         try {
-            //File newPng = new File("/Users/EBT/Desktop/FriendlyBotFB/recent.png");
-            File newPng = new File("recent.png");
+            File newPng = new File("/Users/EBT/Desktop/FriendlyBotFB/recent.png");
             ec.exportFile(newPng, exp);
             System.out.println("Png Exported");
         } catch (IOException ex) {
@@ -447,8 +468,7 @@ public class GephiVisualizer {
 
         // export pdf
         try {
-            //File newPdf = new File("/Users/EBT/Desktop/FriendlyBotFB/pdfs/" + filename + ".pdf");
-            File newPdf = new File("pdfs/" + filename + ".pdf");
+            File newPdf = new File("/Users/EBT/Desktop/FriendlyBotFB/pdfs/" + filename + ".pdf");
             ec.exportFile(newPdf, exp2);
             System.out.println("Pdf Exported");
         } catch (IOException ex) {

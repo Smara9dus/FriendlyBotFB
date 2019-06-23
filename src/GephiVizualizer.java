@@ -43,15 +43,15 @@ import java.util.Random;
 // TODO: Find a replacement for org.openide.util.Lookup since this keeps causing warnings
 // TODO: Proper java code style cleanup
 // TODO: Link to gephi-toolkit HeadlessSimple code that I started with
-// TODO: Fix up the text printed to the console
+// TODO: Get rid of duplicate files and change filtering function
 // TODO: Find a different way to select a random dataset from the directory THAT REQUIRES LESS LINES!
-// TODO: Capitalize first letter in the actual file names and get rid of this line
 // TODO: Update probability of each layout. Make plain Fruchterman Reingold happen less and ForceAtlas2 work more
 // TODO: Use specific range of iters for each layout option (Some make really small initial steps so the low range must be raised)
 // TODO: Make a custom palette generator?
 // TODO: Add rare option of color function containing 3 colors
 // TODO: Make exported PDF square (figure out how to get a square PageSize)
 // TODO: Modularity doesn't work for some datasets, switch to using forcePartitionFunction
+// TODO: Add progress tickets for each step
 
 public class GephiVizualizer {
 
@@ -234,8 +234,6 @@ public class GephiVizualizer {
 
         //See if graph is well imported
         graph = graphModel.getUndirectedGraph();
-        System.out.println("Nodes: " + graph.getNodeCount());
-        System.out.println("Edges: " + graph.getEdgeCount());
 
         System.out.println("Data imported");
     }
@@ -249,11 +247,6 @@ public class GephiVizualizer {
         Query query = filterController.createQuery(degreeFilter);
         GraphView view = filterController.filter(query);
         graphModel.setVisibleView(view);
-
-        //See visible graph stats
-        UndirectedGraph graphVisible = graphModel.getUndirectedGraphVisible();
-        System.out.println("Filtered Nodes: " + graphVisible.getNodeCount());
-        System.out.println("Filtered Edges: " + graphVisible.getEdgeCount());
 
         System.out.println("Data filtered");
     }
@@ -359,7 +352,7 @@ public class GephiVizualizer {
 
         switch(option) {
             case 1: { // Rank color by Eigenvector Centrality
-                //System.out.println("Color: Eigenvector Centrality");
+                System.out.println("Color: Eigenvector Centrality");
                 EigenvectorCentrality eigen = new EigenvectorCentrality();
                 eigen.execute(graphModel);
                 Column eigenColumn = graphModel.getNodeTable().getColumn(EigenvectorCentrality.EIGENVECTOR);
@@ -371,7 +364,7 @@ public class GephiVizualizer {
                 break;
             }
             case 2: { // Rank color by Centrality
-                //System.out.println("Color: Centrality");
+                System.out.println("Color: Centrality");
                 GraphDistance distance = new GraphDistance();
                 distance.setDirected(false);
                 distance.execute(graphModel);
@@ -384,7 +377,7 @@ public class GephiVizualizer {
                 break;
             }
             case 3: { // Rank color by PageRank
-                //System.out.println("Color: PageRank");
+                System.out.println("Color: PageRank");
                 PageRank pageRank = new PageRank();
                 pageRank.execute(graphModel);
                 Column pageRankColumn = graphModel.getNodeTable().getColumn(PageRank.PAGERANK);
@@ -396,7 +389,7 @@ public class GephiVizualizer {
                 break;
             }
             case 4: { // Rank color by degree
-                //System.out.println("Color: Degree");
+                System.out.println("Color: Degree");
                 Function degreeRanking = appearanceModel.getNodeFunction(graph, AppearanceModel.GraphFunction.NODE_DEGREE, RankingElementColorTransformer.class);
                 RankingElementColorTransformer degreeTransformer = degreeRanking.getTransformer();
                 degreeTransformer.setColors(new Color[]{ color1, color2});
@@ -405,7 +398,7 @@ public class GephiVizualizer {
                 break;
             }
             default: {
-                //System.out.println("Color: Modularity Class");
+                System.out.println("Color: Modularity Class");
                 Modularity modularity = new Modularity();
                 modularity.setUseWeight(Boolean.FALSE);
                 modularity.setRandom(Boolean.TRUE);
@@ -420,7 +413,7 @@ public class GephiVizualizer {
             }
         }
 
-        System.out.println("Color transform complete");
+        System.out.println("Color function complete");
     }
 
     private void size() {
@@ -432,7 +425,7 @@ public class GephiVizualizer {
 
         switch(option) {
             case 1: { // Rank size by Eigenvector Centrality
-                //System.out.println("Size: Eigenvector Centrality");
+                System.out.println("Size: Eigenvector Centrality");
                 EigenvectorCentrality eigen = new EigenvectorCentrality();
                 eigen.execute(graphModel);
                 Column eigenColumn = graphModel.getNodeTable().getColumn(EigenvectorCentrality.EIGENVECTOR);
@@ -444,7 +437,7 @@ public class GephiVizualizer {
                 break;
             }
             case 2: { // Rank size by Centrality
-                //System.out.println("Size: Centrality");
+                System.out.println("Size: Centrality");
                 GraphDistance distance = new GraphDistance();
                 distance.setDirected(false);
                 distance.execute(graphModel);
@@ -457,7 +450,7 @@ public class GephiVizualizer {
                 break;
             }
             case 3: { // Rank size by PageRank
-                //System.out.println("Size: PageRank");
+                System.out.println("Size: PageRank");
                 PageRank pageRank = new PageRank();
                 pageRank.execute(graphModel);
                 Column pageRankColumn = graphModel.getNodeTable().getColumn(PageRank.PAGERANK);
@@ -469,7 +462,7 @@ public class GephiVizualizer {
                 break;
             }
             case 4: { // Rank size by degree
-                //System.out.println("Size: Degree");
+                System.out.println("Size: Degree");
                 Function degreeRanking = appearanceModel.getNodeFunction(graph, AppearanceModel.GraphFunction.NODE_DEGREE, RankingNodeSizeTransformer.class);
                 RankingNodeSizeTransformer degreeTransformer = degreeRanking.getTransformer();
                 degreeTransformer.setMinSize(minSize);
@@ -478,8 +471,8 @@ public class GephiVizualizer {
                 break;
             }
             default: {
-                //System.out.println("No Size Ranking");
-                break;
+                System.out.println("No Size Ranking");
+                return;
             }
         }
 
@@ -499,12 +492,17 @@ public class GephiVizualizer {
             model.getProperties().putValue(PreviewProperty.EDGE_CURVED, false);
         }
 
-        // Graph style (10% Invisible nodes, 40% Random opacity, 30% Normal nodes, 20% Normal nodes/edges)
+        // Graph style (10% Invisible nodes, 10% Invisible edges, 30% Random opacity, 30% Normal nodes, 20% Normal nodes/edges)
         int option = rand.nextInt(10);
-        if (option < 2) {
+        if (option < 1) {
+            System.out.println("Invisible Nodes");
             model.getProperties().putValue(PreviewProperty.NODE_OPACITY, 0.01);
             model.getProperties().putValue(PreviewProperty.EDGE_OPACITY, rand.nextFloat()*100);
             model.getProperties().putValue(PreviewProperty.EDGE_THICKNESS, rand.nextFloat()*14.9+.1f);
+        } else if (option < 2) {
+            System.out.println("Invisible Edges");
+            model.getProperties().putValue(PreviewProperty.NODE_OPACITY, rand.nextFloat()*50 + 50f);
+            model.getProperties().putValue(PreviewProperty.EDGE_OPACITY, 0.01);
         } else if (option < 5) {
             model.getProperties().putValue(PreviewProperty.NODE_OPACITY, rand.nextFloat()*100);
             model.getProperties().putValue(PreviewProperty.EDGE_OPACITY, rand.nextFloat()*100);

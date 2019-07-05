@@ -5,7 +5,6 @@ import org.gephi.appearance.plugin.RankingElementColorTransformer;
 import org.gephi.appearance.plugin.RankingNodeSizeTransformer;
 import org.gephi.appearance.plugin.palette.Palette;
 import org.gephi.appearance.plugin.palette.PaletteManager;
-import org.gephi.datalab.impl.GraphElementsControllerImpl;
 import org.gephi.filters.api.FilterController;
 import org.gephi.filters.api.Query;
 import org.gephi.filters.api.Range;
@@ -47,16 +46,16 @@ import java.util.Random;
 // TODO: Use specific range of iters for each layout option (Some make really small initial steps so the low range must be raised)
 // TODO: Make a custom palette generator?
 // TODO: Add rare option of color function containing 3 colors
-// TODO: Make exported PDF square (figure out how to get a square PageSize)
 // TODO: Modularity doesn't work for some datasets, switch to using forcePartitionFunction
 // TODO: Invent a new circular layout
+// TODO: All absolute paths for running from terminal
+// TODO: Optimize the hell out of everything where possible
+// TODO: Switch from PDF to SVG
 
 public class GephiVisualizer {
 
     private Random rand;
-
     private Workspace workspace;
-
     private UndirectedGraph graph;
     private GraphModel graphModel;
     private PreviewModel model;
@@ -69,7 +68,7 @@ public class GephiVisualizer {
 
         rand = new Random();
 
-        File dir = new File("src/data/");
+        File dir = new File("/Users/EBT/Desktop/FriendlyBotFB/src/data/");
         File[] list = dir.listFiles();
 
         File f = list[rand.nextInt(list.length)];

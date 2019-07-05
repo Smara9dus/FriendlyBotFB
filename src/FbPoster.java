@@ -1,4 +1,5 @@
 import com.restfb.*;
+import com.restfb.exception.FacebookNetworkException;
 import com.restfb.types.FacebookType;
 import java.io.File;
 import java.io.IOException;
@@ -25,20 +26,37 @@ public class FbPoster {
 
     public void postPhoto(String name) {
 
-        System.out.println("Uploading photo...");
+        boolean uploaded = false;
 
-        Random rand = new Random();
-        String message = messages[rand.nextInt(messages.length)].replace("X", name);
-        try {
-            File file = new File("/Users/EBT/Desktop/FriendlyBotFB/recent.png");
-            byte[] imageAsBytes = Files.readAllBytes(file.toPath());
-            FacebookClient facebookClient = new DefaultFacebookClient(accessToken,Version.LATEST);
-            FacebookType publishPhotoResponse = facebookClient.publish(pageId + "/photos", FacebookType.class,
-                    BinaryAttachment.with("recent.png", imageAsBytes, "image/png"),
-                    Parameter.with("message", message));
-            System.out.println("Published: " + publishPhotoResponse.getId());
-        } catch (IOException e) {
-            e.printStackTrace();
+        while (!uploaded) {
+            uploaded = true;
+            try {
+                System.out.println("Uploading photo...");
+
+                Random rand = new Random();
+                String message = messages[rand.nextInt(messages.length)].replace("X", name);
+                try {
+                    File file = new File("/Users/EBT/Desktop/FriendlyBotFB/recent.png");
+                    byte[] imageAsBytes = Files.readAllBytes(file.toPath());
+                    FacebookClient facebookClient = new DefaultFacebookClient(accessToken, Version.LATEST);
+                    FacebookType publishPhotoResponse = facebookClient.publish(pageId + "/photos", FacebookType.class,
+                            BinaryAttachment.with("recent.png", imageAsBytes, "image/png"),
+                            Parameter.with("message", message));
+                    System.out.println("Published: " + publishPhotoResponse.getId());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+            } catch (FacebookNetworkException e) {
+                uploaded = false;
+                System.out.println("Upload failed. Trying again in 15s...");
+                try {
+                    Thread.sleep(15000);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }
         }
     }
 }

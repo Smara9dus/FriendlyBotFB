@@ -49,8 +49,6 @@ import java.util.Random;
 // TODO: Add rare option of color function containing 3 colors
 // TODO: Make exported PDF square (figure out how to get a square PageSize)
 // TODO: Modularity doesn't work for some datasets, switch to using forcePartitionFunction
-// TODO: Add progress tickets for each step
-// TODO: Add name to exported pdf filename
 // TODO: Invent a new circular layout
 
 public class GephiVisualizer {
@@ -76,7 +74,7 @@ public class GephiVisualizer {
 
         File f = list[rand.nextInt(list.length)];
 
-        while(f.getPath().contains("DS_Store")){
+        while(!f.getPath().contains("graphml")){
             f = list[rand.nextInt(list.length)];
         }
 

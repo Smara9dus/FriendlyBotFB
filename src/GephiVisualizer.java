@@ -76,6 +76,10 @@ public class GephiVisualizer {
 
         File f = list[rand.nextInt(list.length)];
 
+        while(f.getPath().contains("DS_Store")){
+            f = list[rand.nextInt(list.length)];
+        }
+
         setup();
         importData(f);
         filter();

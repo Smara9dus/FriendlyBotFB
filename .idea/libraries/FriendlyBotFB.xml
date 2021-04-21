@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="FriendlyBotFB">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/out/artifacts/FriendlyBotFB_jar/FriendlyBotFB.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
